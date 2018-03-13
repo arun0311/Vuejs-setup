@@ -1,0 +1,152 @@
+<template>
+  <div>
+    <form @keydown.enter="handleSubmit">
+      <div>
+        <div class="form-group" v-bind:class="{ 'form-group--error': name.$error }">
+          <label class="form__label">Name</label>
+          <input class="form__input" v-model.trim="name" @input="name.$touch()">
+        </div>
+        <span class="form-group__message" v-if="name.required">Field is required</span>
+        <span class="form-group__message" v-if="!name.minLength">Name must have at least 4 letters.</span>
+        <div class="form-group" v-bind:class="{ 'form-group--error': email.$error }">
+          <label class="form__label">Email</label>
+          <input class="form__input" v-model.trim="email" @input="email.$touch()">
+        </div>
+        <span class="form-group__message" v-if="!email.required">Field is required</span>
+        <span class="form-group__message" v-if="!email.email">The input must be a proper email</span>
+        <div class="form-group" v-bind:class="{ 'form-group--error': password.$error }">
+          <label class="form__label">Password</label>
+          <input class="form__input" v-model.trim="password" @input="password.$touch()">
+        </div>
+        <span class="form-group__message" v-if="!password.required">Password is required.</span>
+        <span class="form-group__message" v-if="!password.minLength">Password must have at least 6 letters.</span>
+        <div class="form-group" v-bind:class="{ 'form-group--error': repeatPassword.$error }">
+          <label class="form__label">Repeat password</label>
+          <input class="form__input" v-model.trim="repeatPassword" @input="repeatPassword.$touch()">
+        </div>
+        <span class="form-group__message" v-if="!repeatPassword.sameAsPassword">Passwords must be identical.</span>
+      </div>
+      <p>
+        <input type="submit" value="Submit" @submit="handleSubmit(name,email,password)">
+      </p>
+    </form>
+  </div>
+</template>
+
+<script>
+import stateList from '/home/user/Documents/Vuejs/my-project/src/state.json'
+import { required, minLength, email, sameAs } from 'vuelidate/lib/validators'
+
+export default {
+  data() {
+    return {
+      email: [''],
+      name: [''],
+      password: [''],
+      repeatPassword: ['']
+    }
+  },
+  validations: {
+    email: {
+      required,
+      email
+    },
+    name: {
+      required,
+      minLength: minLength(4)
+    },
+    password: {
+      required,
+      minLength: minLength(6)
+    },
+    repeatPassword: {
+      sameAsPassword: sameAs('password')
+    }
+  },
+  methods: {
+    handleSubmit(name,email,password) {
+      // Send data to the server or update your stores and such.
+      this.form.$touch()
+console.log('hello',name,email,password)
+      if (this.form.$error) {
+        Toast.create('Please review fields again.')
+        return
+      }
+    }
+  }
+}
+</script>
+
+
+
+
+
+
+<template>
+  <form>
+    <div>
+      <label class="form__label">Name</label>
+      <input v-model="form.name" @blur="$v.form.name.$touch" @keyup.enter="submit" :error="$v.form.name.$error" />
+    </div>
+    <div>
+      <label class="form__label">Email</label>
+      <input v-model="form.email" @blur="$v.form.email.$touch" @keyup.enter="submit" :error="$v.form.email.$error" />
+    </div>
+    <div>
+      <label class="form__label">Password</label>
+      <input v-model="form.password" @blur="$v.form.password.$touch" @keyup.enter="submit" :error="$v.form.password.$error" />
+    </div>
+    <div>
+      <label class="form__label">Repeat password</label>
+      <input v-model="form.repassword" @blur="$v.form.repassword.$touch" @keyup.enter="submit" :error="$v.form.repassword.$error" />
+    </div>
+    <button color="primary" @click="submit">Submit</button>
+  </form>
+</template>
+<script>
+import { required, minLength, email, sameAs } from 'vuelidate/lib/validators'
+
+export default {
+  data() {
+    return {
+      form: {
+        name: '',
+        email: '',
+        password: '',
+        repassword: ''
+      }
+    }
+  },
+  validations: {
+    form: {
+      email: {
+        required,
+        email
+      },
+      name: {
+        required,
+        minLength: minLength(4)
+      },
+      password: {
+        required,
+        minLength: minLength(6)
+      },
+      repassword: {
+        sameAsPassword: sameAs('password')
+      }
+    }
+  },
+  methods: {
+    submit() {
+      this.$v.form.$touch()
+
+      if (!this.$v.form.$error) {
+        console.log('Please review fields again.', this.$v.form.$error)
+        return
+      }
+
+      // ...
+    }
+  }
+}
+</script>
